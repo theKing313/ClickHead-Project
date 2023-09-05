@@ -8,6 +8,7 @@ const inter = Inter({ subsets: ['latin'] })
 // import styles from './styles/layout.module.css'
 import './globals.css'
 import './main.scss'
+
 export default function RootLayout(props: React.PropsWithChildren) {
   return (
     <Providers>

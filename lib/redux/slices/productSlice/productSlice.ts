@@ -1,18 +1,6 @@
 import { createSlice, createAsyncThunk, current, type PayloadAction } from '@reduxjs/toolkit'
 import axios from 'axios'
 
-
-
-const fetchFromLocalStorage = () => {
-    // Perform localStorage action
-    let cart = JSON.parse(localStorage.getItem('product')!)
-    if (cart) {
-        return JSON.parse(localStorage.getItem('product')!);
-    } else {
-        return [];
-    }
-
-}
 /* Types */
 export interface CounterSliceState {
     carts: []
@@ -29,32 +17,23 @@ type StoreItemProps = {
     price: number
     quantity: number
 }
-const getStoreInLocalStorage = () => {
-    if (JSON.parse(localStorage.getItem('cart')!)) {
-        return JSON.parse(localStorage.getItem('cart')!)
-    } else {
-        return []
-    }
 
-}
 const initialState: CounterSliceState = {
-    carts: fetchFromLocalStorage(),
-    productsCarts: getStoreInLocalStorage(),
+    carts: [],//fetchFromLocalStorage()
+    productsCarts: [],//getStoreInLocalStorage()
     status: 'idle',
-    totalPriceUser: 5000,
+    totalPriceUser: 0,
     cartQuantity: 0
 }
 
 
-const storeInLocalStorage = (data: unknown) => {
-    localStorage.setItem('cart', JSON.stringify(data));
-}
 
 export const getAllProducts = createAsyncThunk("get/product", async (userId, thunkApi) => {
     try {
         const response = await axios.get('https://dummyjson.com/carts')
         if (response.data) {
             localStorage.setItem('product', JSON.stringify(response.data))
+            console.log(response.data)
         }
         return response.data;
     } catch (error) {
@@ -83,12 +62,10 @@ export const productSlice = createSlice({
                 })
                 state.productsCarts = tempCart;
                 state.productsCarts.filter((item: StoreItemProps) => item.quantity !== 0)
-                storeInLocalStorage(state.productsCarts)
             } else {
                 console.log(action.payload)
                 action.payload.quantity = 1
                 state.productsCarts.push(action.payload)
-                storeInLocalStorage(state.productsCarts)
             }
             state.cartQuantity = state.productsCarts?.reduce((acc, item) => item.quantity + acc, 0)
         },
@@ -106,19 +83,26 @@ export const productSlice = createSlice({
                     }
                 })
                 state.productsCarts = tempCart;
-                storeInLocalStorage(state.productsCarts)
             } else {
                 action.payload.quantity = 1
                 state.productsCarts.push(action.payload)
-                storeInLocalStorage(state.productsCarts)
             }
             state.cartQuantity = state.productsCarts?.reduce((acc, item) => item.quantity + acc, 0)
+
+            state.totalPriceUser = state.productsCarts?.reduce((acc: number, curItem: StoreItemProps) => {
+                const value = state.productsCarts.find((item: any) => curItem.id === item.id)
+                const dollarValue = Math.trunc(acc + ((value?.price || 0) * curItem.quantity))
+                return dollarValue
+            }, 0)
         },
         clearCart: (state) => {
             state.productsCarts = [];
-            storeInLocalStorage(state.productsCarts);
             state.cartQuantity = 0;
+            state.totalPriceUser = 0
         },
+        getUserPayment: (state, action: PayloadAction<number>) => {
+            state.totalPriceUser = action.payload;
+        }
 
     },
     extraReducers: {
@@ -132,6 +116,6 @@ export const productSlice = createSlice({
 })
 
 
-export const { reset, addToCart, clearCart, decreaseCartQuantity } = productSlice.actions
+export const { reset, addToCart, clearCart, decreaseCartQuantity, getUserPayment } = productSlice.actions
 
 export default productSlice.reducer

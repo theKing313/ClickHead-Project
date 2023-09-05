@@ -6,9 +6,18 @@ import {
     useSelector,
     useDispatch,
 } from '@/lib/redux/store'
+import { StoreItemProps } from './products.types'
 export default function Product() {
-    let products = JSON.parse(localStorage.getItem('product')!)
-    const status: any = useSelector((state) => state.productSlice.status)
+    const [products, setProducts] = useState<StoreItemProps>()
+    const dispatch = useDispatch()
+    useEffect(() => {
+        let products = JSON.parse(localStorage.getItem('product')!)
+        if (!products) {
+            dispatch(getAllProducts())
+        }
+        setProducts(products)
+    }, []);
+    const status: any = useSelector((state) => state.product.status)
     return (
         <section className=''>
             <div className="container">

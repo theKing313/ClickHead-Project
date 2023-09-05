@@ -7,19 +7,29 @@ import type { InferGetStaticPropsType, GetStaticProps, GetServerSideProps } from
 import { useDispatch, useSelector } from '@/lib/redux/store'
 import { Button } from "@/components/ui/button"
 import { SlBasketLoaded } from 'react-icons/sl';
-import { clearCart } from '@/lib/redux/slices/productSlice/productSlice';
-import StripeContainer from './Payment/StripeContainer';
+import { clearCart, getUserPayment } from '@/lib/redux/slices/productSlice/productSlice';
+
+// 
+
+import { Elements } from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+import PaymentForm from "@/components/Payment/PaymentForm";
 type StoreItemProps = {
     id: number
     title: string
     price: number
     quantity: number
 }
+// Make sure you load stripe outside the component, otherwise stripe will render every time and you definitely do not want that.
+const stripePromise = loadStripe(
+    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
+);
 export default function Header() {
-    const products: any = useSelector((state) => state.productSlice.productsCarts)
-
+    const products: StoreItemProps[] = useSelector((state) => state.product.productsCarts)
     const dispatch = useDispatch()
     const [basket, setBasket] = useState(false)
+    // 
+    const getQuen = useSelector((state) => state.product.cartQuantity)
 
     return (
         <>
@@ -59,6 +69,9 @@ export default function Header() {
                                                     products?.reduce((acc: number, curItem: StoreItemProps) => {
                                                         const value = products.find((item: StoreItemProps) => curItem.id === item.id)
                                                         const dollarValue = Math.trunc(acc + ((value?.price || 0) * curItem.quantity))
+                                                        // PaymentPrice = dollarValue
+                                                        // setPaymentPrice(dollarValue)
+
                                                         return dollarValue
                                                     }, 0)
                                                 }
@@ -74,7 +87,10 @@ export default function Header() {
                                                     }, 0)
                                                 }
                                             </div>
-                                            {<StripeContainer />}
+                                            {/* {<StripeContainer />} */}
+                                            <Elements stripe={stripePromise}>
+                                                <PaymentForm />
+                                            </Elements>
                                             {products && <Button className='bg-red-500' onClick={() => dispatch(clearCart())}>clearCart</Button>}
 
                                         </div>
@@ -86,7 +102,7 @@ export default function Header() {
                                 <Button className='text-slate-400 text-3xl relative bg-inherit h-full rounded-full' onClick={() => setBasket(!basket)}>
                                     <SlBasketLoaded />
                                     <div className="absolute left-12 bottom-7 text-[#DA00FE] text-sm font-medium rounded-full bg-white w-4 h-4 flex items-center justify-center">
-                                        {products?.reduce((acc: number, item: StoreItemProps) => item.quantity + acc, 0)}
+                                        {/* {products?.reduce((acc: number, item: StoreItemProps) => item.quantity + acc, 0)} */}
                                     </div>
                                 </Button>
                             </div>

@@ -1,7 +1,8 @@
 'use client'
 import { Button } from "@/components/ui/button"
 import { useDispatch } from '@/lib/redux/store'
-import { addToCart, decreaseCartQuantity } from '@/lib/redux/slices/productSlice/productSlice'
+import React, { useEffect, useState } from 'react'
+import { addToCart, decreaseCartQuantity, getUserPayment } from '@/lib/redux/slices/productSlice/productSlice'
 import { useSelector } from '@/lib/redux/store'
 type StoreItemProps = {
     id: number
@@ -10,9 +11,10 @@ type StoreItemProps = {
 }
 export default function ProductItem({ id, title, price }: StoreItemProps) {
     const dispatch = useDispatch()
-    const cartItems: any = useSelector((state) => state.productSlice.productsCarts)
-    const quantity: any = useSelector((state) => state.productSlice.cartQuantity)
+    const cartItems: any = useSelector((state) => state.product.productsCarts)
+    const quantity: any = useSelector((state) => state.product.cartQuantity)
     const getQuen = cartItems.find((item: StoreItemProps) => item.id === id)?.quantity || 0
+
     return (
         <div key={id} className={`${id}`}>
             { }
