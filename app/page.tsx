@@ -36,6 +36,6 @@ export default function IndexPage() {
   )
 }
 
-export const metadata = {
-  title: 'Redux Toolkit',
-}
+// export const metadata = {
+//   title: 'Redux Toolkit',
+// }
