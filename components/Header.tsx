@@ -7,6 +7,7 @@ import type { InferGetStaticPropsType, GetStaticProps, GetServerSideProps } from
 import { useDispatch, useSelector } from '@/lib/redux/store'
 import { Button } from "@/components/ui/button"
 import { SlBasketLoaded } from 'react-icons/sl';
+
 import { clearCart, getUserPayment } from '@/lib/redux/slices/productSlice/productSlice';
 
 // 
@@ -28,8 +29,9 @@ export default function Header() {
     const products: StoreItemProps[] = useSelector((state) => state.product.productsCarts)
     const dispatch = useDispatch()
     const [basket, setBasket] = useState(false)
+    const quantity: number = useSelector((state) => state.product.cartQuantity)
     // 
-    const getQuen = useSelector((state) => state.product.cartQuantity)
+
 
     return (
         <>
@@ -102,8 +104,10 @@ export default function Header() {
                                 <Button className='text-slate-400 text-3xl relative bg-inherit h-full rounded-full' onClick={() => setBasket(!basket)}>
                                     <SlBasketLoaded />
                                     <div className="absolute left-12 bottom-7 text-[#DA00FE] text-sm font-medium rounded-full bg-white w-4 h-4 flex items-center justify-center">
+                                        {/* {quantity} */}
                                         {/* {products?.reduce((acc: number, item: StoreItemProps) => item.quantity + acc, 0)} */}
                                     </div>
+
                                 </Button>
                             </div>
                         </div>

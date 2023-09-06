@@ -14,9 +14,8 @@ export async function POST(req: NextRequest) {
       amount: Number(amount) * 100,
       currency: "USD",
     });
-    console.log('loading..............')
+    console.log('loading.............., success: true')
     return new NextResponse(paymentIntent.client_secret, { status: 200 });
-    console.log('done')
   } catch (error: any) {
     return new NextResponse(error, {
       status: 400,
